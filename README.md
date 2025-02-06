@@ -19,6 +19,6 @@ On your server/VPS:
 8. Now, fill in the values for `JACKETT_API_KEY`, `PROWLARR_API_KEY`, and `COMET_INDEXERS` by getting the values from the respective dashboards
 9. If using Seanime, change the `host` under `[server]` in the ./seanime-config/config.toml file from `127.0.0.1` to `0.0.0.0`
 10. Force a recreation for the updated configuration:
-   ```
-   docker compose up -d --force-recreate
-   ```
+    ```
+    docker compose up -d --force-recreate
+    ```
