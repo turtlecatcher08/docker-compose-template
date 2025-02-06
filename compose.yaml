@@ -123,7 +123,7 @@ services:
       - ADDON_ID=stremio.comet.fast
       - DASHBOARD_ADMIN_PASSWORD=${COMET_ADMIN_PASSWORD}
       - DATABASE_TYPE=postgresql
-      - DATABASE_URL=postgresql://${COMET_POSTGRES_USER}:${COMET_POSTGRES_PASSWORD}@comet-db:5432/comet
+      - DATABASE_URL=${COMET_POSTGRES_USER}:${COMET_POSTGRES_PASSWORD}@comet-db:5432/comet
       - CACHE_TTL=86400 # 1 day
       - DEBRID_PROXY_URL=http://warp:1080
       - INDEXER_MANAGER_TYPE=prowlarr # or jackett
