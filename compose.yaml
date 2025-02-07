@@ -62,7 +62,7 @@ services:
       - "traefik.http.routers.aio.tls.certresolver=myresolver"
 
   tmdb-addon:
-    image: viren070/tmdb-addon:latest
+    image: mrcanelas/tmdb-addon:latest
     container_name: tmdb-addon
     restart: unless-stopped
     expose:
