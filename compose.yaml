@@ -469,7 +469,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       # - "--entryPoints.web.address=:80"  # adguard
-      - "--entryPoints.websecure.address=:443 "
+      - "--entryPoints.websecure.address=:443"
       # - "--entryPoints.dot.address=:853"  # adguard
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
