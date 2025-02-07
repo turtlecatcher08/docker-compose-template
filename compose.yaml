@@ -514,7 +514,22 @@ services:
     volumes:  
       - /var/run/docker.sock:/var/run/docker.sock
 
-
+  # dozzle:
+  #   image: amir20/dozzle:latest
+  #   container_name: dozzle
+  #   restart: unless-stopped
+  #   expose: 
+  #     - 8080
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.dozzle.rule=Host(`${DOZZLE_HOSTNAME}`)"
+  #     - "traefik.http.routers.dozzle.entrypoints=websecure"
+  #     - "traefik.http.routers.dozzle.tls.certresolver=myresolver"
+  #     - "traefik.http.routers.dozzle.middlewares=auth"
+  #     - "traefik.http.middlewares.auth.basicauth.users=${DOZZLE_USERNAME}:${DOZZLE_HASHED_PASSWORD}"
+  #
   # # see @url:https://ae3.ch/adguard-home-docker-with-dns-over-https-and-traefik/
   # # see @url:https://gist.github.com/diyfr/e115a82027fe45a9abf0ff4d578b111f
   # adguard:
