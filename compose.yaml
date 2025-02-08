@@ -60,6 +60,7 @@ services:
       - JACKETT_API_KEY=${JACKETT_API_KEY:-}
       - SECRET_KEY=${AIOSTREAMS_SECRET_KEY} # openssl rand -hex 16
       - DEFAULT_TIMEOUT=5000
+      - TMDB_API_KEY=${TMDB_API_KEY} 
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.aio.rule=Host(`${AIOSTREAMS_HOSTNAME}`)"
