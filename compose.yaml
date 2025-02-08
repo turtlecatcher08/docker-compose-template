@@ -50,9 +50,14 @@ services:
       - EASYNEWS_PLUS_URL=http://easynews-plus:1337/
       - MEDIAFUSION_URL=http://mediafusion:8000/
       - MEDIAFUSION_API_PASSWORD=${MEDIAFUSION_API_PASSWORD}
+      - MEDIAFUSION_CONFIG_TIMEOUT=3000
       - COMET_URL=http://comet:2020/
+      - FORCE_COMET_HOSTNAME=${COMET_HOSTNAME}
+      - COMET_INDEXERS=${COMET_INDEXERS:+${COMET_INDEXERS}}
       - JACKETTIO_URL=http://jackettio:4000/
       - STREMIO_JACKETT_URL=http://stremio-jackett:3000/
+      - JACKETT_URL=http://jackett:9117/
+      - JACKETT_API_KEY=${JACKETT_API_KEY:-}
       - SECRET_KEY=${AIOSTREAMS_SECRET_KEY} # openssl rand -hex 16
       - DEFAULT_TIMEOUT=5000
     labels:
@@ -541,6 +546,7 @@ services:
 
   # see @url:https://ae3.ch/adguard-home-docker-with-dns-over-https-and-traefik/
   # see @url:https://gist.github.com/diyfr/e115a82027fe45a9abf0ff4d578b111f
+  # see @url:https://jmcglock.substack.com/p/installing-adguard-home-on-oracle
   # adguard:
   #   image: adguard/adguardhome:latest
   #   container_name: adguard
