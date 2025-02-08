@@ -82,6 +82,9 @@ services:
       - "traefik.http.routers.tmdb.entrypoints=websecure"
       - "traefik.http.routers.tmdb.tls.certresolver=myresolver"
       - "traefik.http.services.tmdb.loadbalancer.server.port=3232"
+    depends_on:
+      tmdb-addon-db:
+        condition: service_healthy
 
   tmdb-addon-db: 
     image: mongo:latest
@@ -144,7 +147,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.comet.rule=Host(`${COMET_HOSTNAME}`)"
       - "traefik.http.routers.comet.entrypoints=websecure"
-      - "traefik.http.routers.comet.tls.certresolver=myresolver"
+      - "traefik.http.routers.comet.tls.certresolver=myresolver"      
+    depends_on:
+      comet-db:
+        condition: service_healthy
     
   comet-db:
     image: postgres:17.2-alpine
