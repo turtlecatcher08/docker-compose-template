@@ -536,8 +536,8 @@ services:
       - "traefik.http.routers.dozzle.rule=Host(`${DOZZLE_HOSTNAME}`)"
       - "traefik.http.routers.dozzle.entrypoints=websecure"
       - "traefik.http.routers.dozzle.tls.certresolver=myresolver"
-      - "traefik.http.routers.dozzle.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${DOZZLE_USERNAME}:${DOZZLE_HASHED_PASSWORD}"
+      - "traefik.http.routers.dozzle.middlewares=dozzle-auth"
+      - "traefik.http.middlewares.dozzle-auth.basicauth.users=${DOZZLE_USERNAME}:${DOZZLE_HASHED_PASSWORD}"
 
   # see @url:https://ae3.ch/adguard-home-docker-with-dns-over-https-and-traefik/
   # see @url:https://gist.github.com/diyfr/e115a82027fe45a9abf0ff4d578b111f
@@ -611,8 +611,8 @@ services:
   #     - "traefik.http.routers.seanime.rule=Host(`${SEANIME_HOSTNAME}`)"
   #     - "traefik.http.routers.seanime.entrypoints=websecure"
   #     - "traefik.http.routers.seanime.tls.certresolver=myresolver"
-  #     - "traefik.http.routers.seanime.middlewares=auth"
-  #     - "traefik.http.middlewares.auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
+  #     - "traefik.http.routers.seanime.middlewares=seanime-auth"
+  #     - "traefik.http.middlewares.seanime-auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
 
 volumes:
   warp-data:
