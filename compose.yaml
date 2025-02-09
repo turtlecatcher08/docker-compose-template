@@ -534,6 +534,9 @@ services:
     restart: unless-stopped
     expose: 
       - 8080
+    environment:
+      DOZZLE_ENABLE_ACTIONS: "true"
+      DOZZLE_NO_ANALYTICS: "true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
@@ -543,6 +546,12 @@ services:
       - "traefik.http.routers.dozzle.tls.certresolver=myresolver"
       - "traefik.http.routers.dozzle.middlewares=dozzle-auth"
       - "traefik.http.middlewares.dozzle-auth.basicauth.users=${DOZZLE_USERNAME}:${DOZZLE_HASHED_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 3s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # see @url:https://ae3.ch/adguard-home-docker-with-dns-over-https-and-traefik/
   # see @url:https://gist.github.com/diyfr/e115a82027fe45a9abf0ff4d578b111f
