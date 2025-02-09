@@ -511,9 +511,15 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--log.level=INFO"
+      - "--ping"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./letsencrypt:/letsencrypt"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Warp for SOCKS5 proxy for AIOStreams, MediaFlow Proxy, and Prowlarr, MediaFusion
   warp:
