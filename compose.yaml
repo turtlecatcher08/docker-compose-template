@@ -66,6 +66,12 @@ services:
       - "traefik.http.routers.aio.rule=Host(`${AIOSTREAMS_HOSTNAME}`)"
       - "traefik.http.routers.aio.entrypoints=websecure"
       - "traefik.http.routers.aio.tls.certresolver=myresolver"
+    healthcheck:
+      test: wget -qO- http://localhost:3000/health
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   tmdb-addon:
     image: mrcanelas/tmdb-addon:latest
@@ -157,7 +163,13 @@ services:
     depends_on:
       comet-db:
         condition: service_healthy
-    
+    healthcheck: 
+      test: wget -qO- http://127.0.0.1:2020/health
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
   comet-db:
     image: postgres:17.2-alpine
     container_name: comet-db
@@ -192,6 +204,12 @@ services:
       - "traefik.http.routers.mediaflow.rule=Host(`${MEDIAFLOW_HOSTNAME}`)"
       - "traefik.http.routers.mediaflow.entrypoints=websecure"
       - "traefik.http.routers.mediaflow.tls.certresolver=myresolver"
+    healthcheck:
+      test: python3 -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8888/health').read().decode())"
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   # MediaFusion
   mediafusion:
@@ -444,6 +462,12 @@ services:
       - "traefik.http.routers.jackett.rule=Host(`${JACKETT_HOSTNAME}`)"
       - "traefik.http.routers.jackett.entrypoints=websecure"
       - "traefik.http.routers.jackett.tls.certresolver=myresolver"
+    healthcheck:
+      test: curl -f http://localhost:9117/health 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -628,6 +652,12 @@ services:
   #     - "traefik.http.routers.seanime.tls.certresolver=myresolver"
   #     - "traefik.http.routers.seanime.middlewares=seanime-auth"
   #     - "traefik.http.middlewares.seanime-auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
+  #   healthcheck:
+  #     test: wget -qO- http://localhost:43211/api/v1/status
+  #     interval: 5m
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 10s
 
 volumes:
   warp-data:
