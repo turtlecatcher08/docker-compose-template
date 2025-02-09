@@ -493,21 +493,20 @@ services:
 
   # Warp for SOCKS5 proxy for AIOStreams, MediaFlow Proxy, and Prowlarr, MediaFusion
   warp:
-    image: monius/docker-warp-socks:v3
+    image: caomingjun/warp
     container_name: warp
     restart: unless-stopped
     expose:
       - 1080
     environment:
-      - NET_PORT=1080
+      - WARP_SLEEP=2
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - warp-data:/lib/modules
+      - warp-data:/var/lib/cloudflare-warp
     healthcheck:
       test: curl -x "socks5h://127.0.0.1:1080" -fsSL "https://www.cloudflare.com/cdn-cgi/trace" | grep -qE "warp=(plus|on)" || exit 1
       interval: 15s
