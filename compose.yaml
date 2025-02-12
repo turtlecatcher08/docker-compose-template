@@ -84,7 +84,7 @@ services:
       - TMDB_API=${TMDB_API_KEY}  # https://www.themoviedb.org/settings/api
       - FANART_API=${FANART_API_KEY}  # https://fanart.tv/get-an-api-key/
       - HOST_NAME=tmdb-${TMDB_ADDON_HOSTNAME}
-      - MONGODB_URI=mongodb://tmdb-addon-db:27017/tmdb
+      - MONGODB_URI=mongodb://mongodb:27017/tmdb
       - META_TTL=604800  # 1 week
       - CATALOG_TTL=86400  # 1 day
       - NO_CACHE=false  # Enable cache, set to true to disable
@@ -95,22 +95,8 @@ services:
       - "traefik.http.routers.tmdb.tls.certresolver=myresolver"
       - "traefik.http.services.tmdb.loadbalancer.server.port=3232"
     depends_on:
-      tmdb-addon-db:
+      mongodb:
         condition: service_healthy
-
-  tmdb-addon-db: 
-    image: mongo:latest
-    container_name: tmdb-addon-db
-    restart: unless-stopped
-    volumes:
-      - tmdb-addon-db:/data/db
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-
 
   easynews-plus:
     image: ghcr.io/sleeyax/stremio-easynews-addon:latest
@@ -138,7 +124,7 @@ services:
       - ADDON_ID=stremio.comet.fast
       - DASHBOARD_ADMIN_PASSWORD=${COMET_ADMIN_PASSWORD}
       - DATABASE_TYPE=postgresql
-      - DATABASE_URL=${COMET_POSTGRES_USER}:${COMET_POSTGRES_PASSWORD}@comet-db:5432/comet
+      - DATABASE_URL=${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/comet
       - CACHE_TTL=86400 # 1 day
       - DEBRID_PROXY_URL=http://warp:1080
       - INDEXER_MANAGER_TYPE=prowlarr # or jackett
@@ -161,7 +147,7 @@ services:
       - "traefik.http.routers.comet.entrypoints=websecure"
       - "traefik.http.routers.comet.tls.certresolver=myresolver"      
     depends_on:
-      comet-db:
+      postgres:
         condition: service_healthy
     healthcheck: 
       test: wget -qO- http://127.0.0.1:2020/health
@@ -170,24 +156,7 @@ services:
       retries: 5
       start_period: 10s
 
-  comet-db:
-    image: postgres:17.2-alpine
-    container_name: comet-db
-    restart: unless-stopped
-    shm_size: 2G
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: ${COMET_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${COMET_POSTGRES_PASSWORD}
-      POSTGRES_DB: comet
-    volumes:
-      - comet-data:/var/lib/postgresql/data/pgdata
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+  
   # Mediaflow Proxy service
   mediaflow-proxy:
     image: mhdzumair/mediaflow-proxy
@@ -221,8 +190,8 @@ services:
     environment:
       - HOST_URL=https://${MEDIAFUSION_HOSTNAME}
       - POSTER_HOST_URL=https://${MEDIAFUSION_HOSTNAME}
-      - MONGO_URI=mongodb://mediafusion-db:27017/mediafusion
-      - REDIS_URL=redis://mediafusion-cache:6379
+      - MONGO_URI=mongodb://mongodb:27017/mediafusion
+      - REDIS_URL=redis://redis:6379
       - IS_SCRAP_FROM_TORRENTIO=true
       - IS_SCRAP_FROM_MEDIAFUSION=true
       - IS_SCRAP_FROM_ZILEAN=true
@@ -259,9 +228,9 @@ services:
       retries: 5
       start_period: 10s
     depends_on:
-      mediafusion-db:
+      mongodb:
         condition: service_healthy
-      mediafusion-cache:
+      redis:
         condition: service_healthy
       warp:
         condition: service_healthy
@@ -270,35 +239,7 @@ services:
       - "traefik.http.routers.mediafusion.rule=Host(`${MEDIAFUSION_HOSTNAME}`)"
       - "traefik.http.routers.mediafusion.entrypoints=websecure"
       - "traefik.http.routers.mediafusion.tls.certresolver=myresolver"
-    
-  # MongoDB for MediaFusion
-  mediafusion-db:
-    image: mongo:latest
-    container_name: mediafusion-db
-    restart: unless-stopped
-    volumes:
-      - mediafusion-data:/data/db
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
 
-  # Redis for MediaFusion
-  mediafusion-cache:
-    image: redis:latest
-    container_name: mediafusion-cache
-    restart: unless-stopped
-    volumes:
-      - mediafusion-cache:/data
-    command: redis-server --appendonly yes --save 60 1
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-  
   stremthru:
     image: muniftanjim/stremthru:latest-heavy
     container_name: stremthru
@@ -313,10 +254,12 @@ services:
       - STREMTHRU_STORE_TUNNEL=realdebrid:api                   # Only send RD API via tunnel, not all access (e.g playback)
       - STREMTHRU_STORE_CONTENT_PROXY=*:true,easydebrid:false,premiumize:false
       - STREMTHRU_PEER_URI=https://stremthru.mooo.com
-      - STREMTHRU_DATABASE_URI=postgresql://${STREMTHRU_POSTGRES_USER}:${STREMTHRU_POSTGRES_PASSWORD}@stremthru-db:5432/stremthru?sslmode=disable
-      - STREMTHRU_REDIS_URI=redis://stremthru-cache:6379
+      - STREMTHRU_DATABASE_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/stremthru?sslmode=disable
+      - STREMTHRU_REDIS_URI=redis://redis:6379
     depends_on:
       warp:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
@@ -324,36 +267,7 @@ services:
       - "traefik.http.routers.stremthru.entrypoints=websecure"
       - "traefik.http.routers.stremthru.tls.certresolver=myresolver"
   
-  stremthru-cache:
-    image: redis:latest
-    container_name: stremthru-cache
-    restart: unless-stopped
-    volumes:
-      - stremthru-cache:/data
-    command: redis-server --appendonly yes --save 60 1
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-  
-  stremthru-db:
-    image: postgres:17.2-alpine
-    container_name: stremthru-db
-    restart: unless-stopped
-    shm_size: 2G
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: ${STREMTHRU_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${STREMTHRU_POSTGRES_PASSWORD}
-      POSTGRES_DB: stremthru
-    volumes:
-      - stremthru-data:/var/lib/postgresql/data/pgdata
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
 
   stremio-jackett:
     image: belmeg/stremio-addon-jackett
@@ -380,9 +294,9 @@ services:
     environment:
       - JACKETT_URL=http://jackett:9117
       - JACKETT_API_KEY=${JACKETT_API_KEY:-}
-      - TMDB_ACCESS_TOKEN=${TMDB_API_KEY}
+      - TMDB_ACCESS_TOKEN=${TMDB_ACCESS_TOKEN}
     volumes:
-      - jackettio-data:/jackettio-data
+      - jackettio-data:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jackettio.rule=Host(`${JACKETTIO_HOSTNAME}`)"
@@ -395,36 +309,20 @@ services:
     container_name: zilean
     tty: true
     environment:
-      Zilean__Database__ConnectionString: Host=zilean-db;Database=zilean;Username=${ZILEAN_POSTGRES_USERNAME};Password=${ZILEAN_POSTGRES_PASSWORD};Include Error Detail=true;Timeout=30;CommandTimeout=3600
+      Zilean__Database__ConnectionString: Host=postgres;Database=zilean;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=true;Timeout=30;CommandTimeout=3600
     healthcheck:
       test: curl --connect-timeout 10 --silent --show-error --fail http://localhost:8181/healthchecks/ping
       timeout: 60s
       interval: 30s
       retries: 10
     depends_on:
-      zilean-db:
+      postgres:
         condition: service_healthy
     volumes:
       - zilean-tmp:/tmp
 
 
-  zilean-db:
-    image: postgres:17.2-alpine
-    container_name: zilean-db
-    restart: unless-stopped
-    shm_size: 2G
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: zilean
-    volumes:
-      - zilean-data:/var/lib/postgresql/data/pgdata
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest
@@ -468,6 +366,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+  
+  nzbhydra2:
+    container_name: nzbhydra2
+    image: ghcr.io/hotio/nzbhydra2:latest
+    expose:
+      - 5076
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=${TZ:-UTC} 
+    volumes:
+      - ./nzbhydra_config:/config
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nzbhydra2.rule=Host(`${NZBHYDRA2_HOSTNAME}`)"
+      - "traefik.http.routers.nzbhydra2.entrypoints=websecure"
+      - "traefik.http.routers.nzbhydra2.tls.certresolver=myresolver"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -491,36 +408,6 @@ services:
       - "traefik.http.routers.stremio-server.entrypoints=websecure"
       - "traefik.http.routers.stremio-server.tls.certresolver=myresolver"
 
-  traefik:
-    image: traefik:v3
-    container_name: traefik
-    restart: unless-stopped
-    ports:
-      - 443:443
-      # - 80:80  # adguard
-      - 127.0.0.1:8080:8080
-      # - 853:853/tcp  # adguard
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      # - "--entryPoints.web.address=:80"  # adguard
-      - "--entryPoints.websecure.address=:443"
-      # - "--entryPoints.dot.address=:853"  # adguard
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--log.level=INFO"
-      - "--ping"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
-    healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
   # Warp for SOCKS5 proxy for AIOStreams, MediaFlow Proxy, and Prowlarr, MediaFusion
   warp:
     image: caomingjun/warp
@@ -542,6 +429,51 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
+      
+  mongodb: 
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+  
+  postgres:
+    image: postgres:17.2-alpine
+    container_name: postgres
+    restart: unless-stopped
+    shm_size: 2G
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis: 
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --save 60 1
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   # Watchtower for auto-updating services
   watchtower:
@@ -582,7 +514,66 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
+  
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 443:443
+      # - 80:80  # adguard
+      - 127.0.0.1:8080:8080
+      # - 853:853/tcp  # adguard
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # - "--entryPoints.web.address=:80"  # adguard
+      - "--entryPoints.websecure.address=:443"
+      # - "--entryPoints.dot.address=:853"  # adguard
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=INFO"
+      - "--ping"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
+  # https://github.com/5rahim/seanime
+  # App/Server for anime.
+  # seanime:
+  #   image: umagistr/seanime
+  #   container_name: seanime
+  #   command: 
+  #   volumes:
+  #     - /mnt/user/anime:/anime
+  #     - /mnt/user/downloads:/downloads
+  #     - ./seanime-config:/root/.config/Seanime
+  #   expose:
+  #     - 43211
+  #   restart: unless-stopped
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.seanime.rule=Host(`${SEANIME_HOSTNAME}`)"
+  #     - "traefik.http.routers.seanime.entrypoints=websecure"
+  #     - "traefik.http.routers.seanime.tls.certresolver=myresolver"
+  #     - "traefik.http.routers.seanime.middlewares=seanime-auth"
+  #     - "traefik.http.middlewares.seanime-auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
+  #   healthcheck:
+  #     test: wget -qO- http://localhost:43211/api/v1/status
+  #     interval: 5m
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 10s
+
+  # To setup AdGuard Home with DNS-over-HTTPS and Traefik, it requires quite a bit of setup.
+  # I would not recommend this.
   # see @url:https://ae3.ch/adguard-home-docker-with-dns-over-https-and-traefik/
   # see @url:https://gist.github.com/diyfr/e115a82027fe45a9abf0ff4d578b111f
   # see @url:https://jmcglock.substack.com/p/installing-adguard-home-on-oracle
@@ -621,61 +612,14 @@ services:
   #     - "traefik.tcp.routers.adguard-tls.tls.certresolver=myresolver"
   #     - "traefik.tcp.routers.adguard-tls.service=adguard-tls"
   #     - "traefik.tcp.services.adguard-tls.loadbalancer.server.port=53"
- 
-  # nzbhydra2:
-  #   container_name: nzbhydra2
-  #   image: ghcr.io/hotio/nzbhydra2:latest
-  #   expose:
-  #     - 5076
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - UMASK=002
-  #     - TZ=${TZ:-UTC}  # Add timezone support
-  #   volumes:
-  #     - ./nzbhydra_config:/config
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.nzbhydra2.rule=Host(`${NZBHYDRA2_HOSTNAME}`)"
-  #     - "traefik.http.routers.nzbhydra2.entrypoints=websecure"
-  #     - "traefik.http.routers.nzbhydra2.tls.certresolver=myresolver"
-  # seanime:
-  #   image: umagistr/seanime
-  #   container_name: seanime
-  #   command: 
-  #   volumes:
-  #     - /mnt/user/anime:/anime
-  #     - /mnt/user/downloads:/downloads
-  #     - ./seanime-config:/root/.config/Seanime
-  #   expose:
-  #     - 43211
-  #   restart: unless-stopped
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.seanime.rule=Host(`${SEANIME_HOSTNAME}`)"
-  #     - "traefik.http.routers.seanime.entrypoints=websecure"
-  #     - "traefik.http.routers.seanime.tls.certresolver=myresolver"
-  #     - "traefik.http.routers.seanime.middlewares=seanime-auth"
-  #     - "traefik.http.middlewares.seanime-auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
-  #   healthcheck:
-  #     test: wget -qO- http://localhost:43211/api/v1/status
-  #     interval: 5m
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 10s
 
 volumes:
   warp-data:
-  comet-data:
   prowlarr-config:
   jackett-config:
   jackettio-data:
-  mediafusion-data:
-  mediafusion-cache:
-  stremthru-cache:
-  stremthru-data:
-  zilean-data:
   zilean-tmp:
-  tmdb-addon-db:
+  redis-data:
+  postgres-data:
+  mongodb-data:
 
