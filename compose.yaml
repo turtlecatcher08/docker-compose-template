@@ -310,6 +310,8 @@ services:
     tty: true
     environment:
       Zilean__Database__ConnectionString: Host=postgres;Database=zilean;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=true;Timeout=30;CommandTimeout=3600
+      Zilean__Imdb__UseAllCores: true
+      Zilean__Imdb__UseLucene: true
     healthcheck:
       test: curl --connect-timeout 10 --silent --show-error --fail http://localhost:8181/healthchecks/ping
       timeout: 60s
