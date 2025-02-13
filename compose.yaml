@@ -66,6 +66,10 @@ services:
       - "traefik.http.routers.aio.rule=Host(`${AIOSTREAMS_HOSTNAME}`)"
       - "traefik.http.routers.aio.entrypoints=websecure"
       - "traefik.http.routers.aio.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=AIOStreams"
+      - "flame.url=https://${AIOSTREAMS_HOSTNAME}"
+
     healthcheck:
       test: wget -qO- http://localhost:3000/health
       interval: 1m
@@ -94,6 +98,9 @@ services:
       - "traefik.http.routers.tmdb.entrypoints=websecure"
       - "traefik.http.routers.tmdb.tls.certresolver=myresolver"
       - "traefik.http.services.tmdb.loadbalancer.server.port=3232"
+      - "flame.type=app"
+      - "flame.name=TMDB Addon"
+      - "flame.url=https://${TMDB_ADDON_HOSTNAME}"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -109,6 +116,9 @@ services:
       - "traefik.http.routers.easynews.rule=Host(`${EASYNEWS_PLUS_HOSTNAME}`)"
       - "traefik.http.routers.easynews.entrypoints=websecure"
       - "traefik.http.routers.easynews.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Easynews+"
+      - "flame.url=https://${EASYNEWS_PLUS_HOSTNAME}"
 
   comet:
     container_name: comet
@@ -145,7 +155,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.comet.rule=Host(`${COMET_HOSTNAME}`)"
       - "traefik.http.routers.comet.entrypoints=websecure"
-      - "traefik.http.routers.comet.tls.certresolver=myresolver"      
+      - "traefik.http.routers.comet.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Comet"
+      - "flame.url=https://${COMET_HOSTNAME}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -173,6 +186,9 @@ services:
       - "traefik.http.routers.mediaflow.rule=Host(`${MEDIAFLOW_HOSTNAME}`)"
       - "traefik.http.routers.mediaflow.entrypoints=websecure"
       - "traefik.http.routers.mediaflow.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=MediaFlow Proxy"
+      - "flame.url=https://${MEDIAFLOW_HOSTNAME}"
     healthcheck:
       test: python3 -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8888/health').read().decode())"
       interval: 1m
@@ -239,6 +255,9 @@ services:
       - "traefik.http.routers.mediafusion.rule=Host(`${MEDIAFUSION_HOSTNAME}`)"
       - "traefik.http.routers.mediafusion.entrypoints=websecure"
       - "traefik.http.routers.mediafusion.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=MediaFusion"
+      - "flame.url=https://${MEDIAFUSION_HOSTNAME}"
 
   stremthru:
     image: muniftanjim/stremthru:latest-heavy
@@ -266,6 +285,10 @@ services:
       - "traefik.http.routers.stremthru.rule=Host(`${STREMTHRU_HOSTNAME}`)"
       - "traefik.http.routers.stremthru.entrypoints=websecure"
       - "traefik.http.routers.stremthru.tls.certresolver=myresolver"
+      - "traefik.http.services.stremthru.loadbalancer.server.port=8080"
+      - "flame.type=app"
+      - "flame.name=StremThru"
+      - "flame.url=https://${STREMTHRU_HOSTNAME}"
   
 
 
@@ -284,6 +307,9 @@ services:
       - "traefik.http.routers.stremiojackett.rule=Host(`${STREMIO_JACKETT_HOSTNAME}`)"
       - "traefik.http.routers.stremiojackett.entrypoints=websecure"
       - "traefik.http.routers.stremiojackett.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Stremio-Jackett"
+      - "flame.url=https://${STREMIO_JACKETT_HOSTNAME}"
     
   jackettio:
     image: arvida42/jackettio:latest
@@ -296,12 +322,15 @@ services:
       - JACKETT_API_KEY=${JACKETT_API_KEY:-}
       - TMDB_ACCESS_TOKEN=${TMDB_ACCESS_TOKEN}
     volumes:
-      - jackettio-data:/data
+      - ./data/jackettio:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jackettio.rule=Host(`${JACKETTIO_HOSTNAME}`)"
       - "traefik.http.routers.jackettio.entrypoints=websecure"
       - "traefik.http.routers.jackettio.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Jackettio"
+      - "flame.url=https://${JACKETTIO_HOSTNAME}"
     
   zilean:
     image: ipromknight/zilean:latest
@@ -337,13 +366,16 @@ services:
     expose:
       - 9696
     volumes:
-      - prowlarr-config:/config
+      - ./data/prowlarr:/config
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_HOSTNAME}`)"
       - "traefik.http.routers.prowlarr.entrypoints=websecure"
       - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Prowlarr"
+      - "flame.url=https://${PROWLARR_HOSTNAME}"
 
   jackett:
     image: linuxserver/jackett:latest
@@ -355,13 +387,16 @@ services:
     expose:
       - 9117
     volumes:
-      - jackett-config:/config
+      - ./data/jackett:/config
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jackett.rule=Host(`${JACKETT_HOSTNAME}`)"
       - "traefik.http.routers.jackett.entrypoints=websecure"
       - "traefik.http.routers.jackett.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Jackett"
+      - "flame.url=https://${JACKETT_HOSTNAME}"
     healthcheck:
       test: curl -f http://localhost:9117/health 
       interval: 30s
@@ -380,13 +415,16 @@ services:
       - UMASK=002
       - TZ=${TZ:-UTC} 
     volumes:
-      - ./nzbhydra_config:/config
+      - ./data/nzbhydra/config:/config
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nzbhydra2.rule=Host(`${NZBHYDRA2_HOSTNAME}`)"
       - "traefik.http.routers.nzbhydra2.entrypoints=websecure"
       - "traefik.http.routers.nzbhydra2.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=NZBHydra2"
+      - "flame.url=https://${NZBHYDRA2_HOSTNAME}"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -409,6 +447,9 @@ services:
       - "traefik.http.routers.stremio-server.rule=Host(`${STREMIO_SERVER_HOSTNAME}`)"
       - "traefik.http.routers.stremio-server.entrypoints=websecure"
       - "traefik.http.routers.stremio-server.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Stremio Server"
+      - "flame.url=https://${STREMIO_SERVER_HOSTNAME}"
 
   # Warp for SOCKS5 proxy for AIOStreams, MediaFlow Proxy, and Prowlarr, MediaFusion
   warp:
@@ -425,7 +466,7 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - warp-data:/var/lib/cloudflare-warp
+      - ./data/warp:/var/lib/cloudflare-warp
     healthcheck:
       test: curl -x "socks5h://127.0.0.1:1080" -fsSL "https://www.cloudflare.com/cdn-cgi/trace" | grep -qE "warp=(plus|on)" || exit 1
       interval: 15s
@@ -476,6 +517,42 @@ services:
       timeout: 5s
       retries: 5
 
+  # Start page for your server
+  flame:
+    image: pawelmalak/flame:multiarch
+    container_name: flame
+    restart: unless-stopped
+    expose:
+      - 5005
+    environment:
+      - PASSWORD=${FLAME_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flame.rule=Host(`${FLAME_HOSTNAME}`)"
+      - "traefik.http.routers.flame.entrypoints=websecure"
+      - "traefik.http.routers.flame.tls.certresolver=myresolver"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/flame:/app/data
+
+  # Status page for monitoring uptime
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: kuma
+    restart: unless-stopped
+    expose:
+      - 3001
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uptime-kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`)"
+      - "traefik.http.routers.uptime-kuma.entrypoints=websecure"
+      - "traefik.http.routers.uptime-kuma.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Uptime Kuma"
+      - "flame.url=https://${UPTIME_KUMA_HOSTNAME}"
+    volumes:
+      - ./data/kuma:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
 
   # Watchtower for auto-updating services
   watchtower:
@@ -510,6 +587,9 @@ services:
       - "traefik.http.routers.dozzle.tls.certresolver=myresolver"
       - "traefik.http.routers.dozzle.middlewares=dozzle-auth"
       - "traefik.http.middlewares.dozzle-auth.basicauth.users=${DOZZLE_USERNAME}:${DOZZLE_HASHED_PASSWORD}"
+      - "flame.type=app"
+      - "flame.name=Dozzle"
+      - "flame.url=https://${DOZZLE_HOSTNAME}"
     healthcheck:
       test: ["CMD", "/dozzle", "healthcheck"]
       interval: 3s
@@ -540,7 +620,7 @@ services:
       - "--ping"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
+      - "./data/letsencrypt:/letsencrypt"
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 10s
@@ -556,7 +636,7 @@ services:
   #   volumes:
   #     - /mnt/user/anime:/anime
   #     - /mnt/user/downloads:/downloads
-  #     - ./seanime-config:/root/.config/Seanime
+  #     - ./data/seanime:/root/.config/Seanime
   #   expose:
   #     - 43211
   #   restart: unless-stopped
@@ -567,6 +647,9 @@ services:
   #     - "traefik.http.routers.seanime.tls.certresolver=myresolver"
   #     - "traefik.http.routers.seanime.middlewares=seanime-auth"
   #     - "traefik.http.middlewares.seanime-auth.basicauth.users=${SEANIME_USERNAME}:${SEANIME_HASHED_PASSWORD}"
+  #     - "flame.type=app"
+  #     - "flame.name=Seanime"
+  #     - "flame.url=https://${SEANIME_HOSTNAME}"
   #   healthcheck:
   #     test: wget -qO- http://localhost:43211/api/v1/status
   #     interval: 5m
@@ -593,8 +676,8 @@ services:
   #     - "53:53/tcp"
   #     - "53:53/udp"
   #   volumes:
-  #     - ./adguard_work:/opt/adguardhome/work
-  #     - ./adguard_conf:/opt/adguardhome/conf
+  #     - ./data/adguard/work:/opt/adguardhome/work
+  #     - ./data/adguard/conf:/opt/adguardhome/conf
   #   labels:
   #     - "traefik.enable=true"
   #     - "traefik.http.routers.adguard.entrypoints=web"
@@ -615,11 +698,11 @@ services:
   #     - "traefik.tcp.routers.adguard-tls.service=adguard-tls"
   #     - "traefik.tcp.services.adguard-tls.loadbalancer.server.port=53"
 
+  #     - "flame.type=app"
+  #     - "flame.name=AdGuard Home"
+  #     - "flame.url=https://${ADGUARD_HOSTNAME}"
+
 volumes:
-  warp-data:
-  prowlarr-config:
-  jackett-config:
-  jackettio-data:
   zilean-tmp:
   redis-data:
   postgres-data:
