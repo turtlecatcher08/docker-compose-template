@@ -1,28 +1,28 @@
 services:
   aiostreams:
-    image: viren070/aiostreams:latest
+    image: ghcr.io/viren070/aiostreams:dev
     container_name: aiostreams
     restart: unless-stopped
     expose:
       - 3000
     environment:
-      - ADDON_PROXY=${ENABLE_PROXY:-false} == "true" && echo ${PROXY_URL} || echo ''
+      - ADDON_PROXY=${PROXY_URL:-}   # only route requests to any strem.fun subdomain through the proxy
       - ADDON_PROXY_CONFIG=*:false,*.strem.fun:true   # only route requests to any strem.fun subdomain through the proxy
-      - EASYNEWS_PLUS_URL=${ENABLE_EASYNEWS_PLUS:-false} == "true" && echo "http://easynews-plus:1337/" || echo ""
-      - MEDIAFUSION_URL=${ENABLE_MEDIAFUSION:-false} == "true" && echo "http://mediafusion:8000/" || echo ""
-      - MEDIAFUSION_API_PASSWORD=${ENABLE_MEDIAFUSION:-false} == "true" && echo ${MEDIAFUSION_API_PASSWORD} || echo ""
+      - EASYNEWS_PLUS_URL=${AIOSTREAMS_EASYNEWS_PLUS_URL:-}
+      - MEDIAFUSION_URL=${AIOSTREAMS_MEDIAFUSION_URL:-}
+      - MEDIAFUSION_API_PASSWORD=${MEDIAFUSION_API_PASSWORD:-}
       - MEDIAFUSION_CONFIG_TIMEOUT=3000
-      - COMET_URL=${ENABLE_COMET:-false} == "true" && echo "http://comet:2020/" || echo ""
-      - FORCE_COMET_HOSTNAME=${ENABLE_COMET:-false} == "true" && echo ${COMET_HOSTNAME} || echo ""
-      - COMET_INDEXERS=${COMET_INDEXERS:+${COMET_INDEXERS}}
-      - JACKETTIO_URL=${ENABLE_JACKETTIO:-false} == "true" && echo "http://jackettio:4000/" || echo ""
-      - STREMIO_JACKETT_URL=${ENABLE_JACKETTIO:-false} == "true" && echo "http://stremio-jackett:3000/" || echo ""
-      - JACKETT_URL=${ENABLE_JACKETT:-false} == "true" && echo "http://jackett:9117/" || echo ""
-      - JACKETT_API_KEY=${ENABLE_JACKETT:-false} == "true" && echo ${JACKETT_API_KEY} || echo ""
-      - JACKETT_INDEXERS=${ENABLE_JACKETT:-false} == "true" && echo ${JACKETT_INDEXERS} || echo ""
-      - SECRET_KEY=${AIOSTREAMS_SECRET_KEY} # openssl rand -hex 16
+      - COMET_URL=${AIOSTREAMS_COMET_URL:-}
+      - FORCE_COMET_HOSTNAME=${COMET_HOSTNAME:-}
+      - COMET_INDEXERS=${COMET_INDEXERS:-}
+      - JACKETTIO_URL=${AIOSTREAMS_JACKETTIO_URL:-}
+      - STREMIO_JACKETT_URL=${AIOSTREAMS_STREMIO_JACKETT_URL:-}
+      - JACKETT_URL=${AIOSTREAMS_JACKETT_URL:-}
+      - JACKETT_API_KEY=${AIOSTREAMS_JACKETT_API_KEY:-}
+      - JACKETT_INDEXERS=${AIOSTREAMS_JACKETT_INDEXERS:-}
+      - SECRET_KEY=${AIOSTREAMS_SECRET_KEY} 
       - DEFAULT_TIMEOUT=5000
-      - TMDB_API_KEY=${TMDB_API_KEY}
+      - TMDB_API_KEY=${TMDB_API_KEY:-}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.aio.rule=Host(`${AIOSTREAMS_HOSTNAME}`)"

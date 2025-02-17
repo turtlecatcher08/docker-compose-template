@@ -1,0 +1,54 @@
+services:
+  comet:
+    container_name: comet
+    image: g0ldyy/comet:latest
+    restart: unless-stopped
+    expose:
+      - 2020
+    environment:
+      - FASTAPI_PORT=2020
+      - FASTAPI_HOST=0.0.0.0
+      - FASTAPI_WORKERS=1
+      - ADDON_NAME=Comet
+      - ADDON_ID=stremio.comet.fast
+      - DASHBOARD_ADMIN_PASSWORD=${COMET_ADMIN_PASSWORD}
+      - DATABASE_TYPE=postgresql
+      - DATABASE_URL=${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/comet
+      - CACHE_TTL=86400 # 1 day
+      - DEBRID_PROXY_URL=http://warp:1080
+      - INDEXER_MANAGER_TYPE=prowlarr # or jackett
+      - INDEXER_MANAGER_URL=http://prowlarr:9696 # or http://jackett:9117
+      - INDEXER_MANAGER_API_KEY=${PROWLARR_API_KEY:-} # or ${JACKETT_API_KEY:-}
+      - INDEXER_MANAGER_TIMEOUT=60 
+      - INDEXER_MANAGER_INDEXERS=${COMET_INDEXERS:-[]} # comma separated list of indexer ids
+      - GET_TORRENT_TIMEOUT=5
+      - ZILEAN_URL=http://zilean:8181
+      - ZILEAN_TAKE_FIRST=500
+      - SCRAPE_TORRENTIO=False
+      - SCRAPE_MEDIAFUSION=False
+      - MEDIAFUSION_URL=https://mediafusion.elfhosted.com
+      - PROXY_DEBRID_STREAM=False
+      - TITLE_MATCH_CHECK=True
+      - REMOVE_ADULT_CONTENT=True
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.comet.rule=Host(`${COMET_HOSTNAME}`)"
+      - "traefik.http.routers.comet.entrypoints=websecure"
+      - "traefik.http.routers.comet.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Comet"
+      - "flame.url=https://${COMET_HOSTNAME}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck: 
+      test: wget -qO- http://127.0.0.1:2020/health
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - addon_network
+networks:
+  addon_network:
+    external: true

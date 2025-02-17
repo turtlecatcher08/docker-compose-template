@@ -29,4 +29,10 @@ services:
           {{range .Entries -}}{{.Message}}{{"\n"}}{{- end -}}
         {{- end -}}
     volumes:  
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock 
+    networks:
+      - addon_network
+  
+networks:
+  addon_network:
+    external: true
