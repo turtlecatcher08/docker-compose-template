@@ -39,7 +39,7 @@
 services:
   # AIOStreams service
   aiostreams:
-    image: ghcr.io/viren070/aiostreams:dev
+    image: viren070/aiostreams:latest
     container_name: aiostreams
     restart: unless-stopped
     expose:
