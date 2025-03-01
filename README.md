@@ -13,6 +13,8 @@ On your server/VPS:
    ```
    curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/.env -o .env
    curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/compose.yaml -o compose.yaml
+   mkdir -p ./data/mediafusion
+   curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/.env.mediafusion -o ./data/mediafusion/.env
    ```
 5. Open the .env file using:
    ```
