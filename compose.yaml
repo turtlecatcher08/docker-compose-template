@@ -205,40 +205,8 @@ services:
     restart: unless-stopped
     expose:
       - 8000
-    environment:
-      - HOST_URL=https://${MEDIAFUSION_HOSTNAME}
-      - POSTER_HOST_URL=https://${MEDIAFUSION_HOSTNAME}
-      - MONGO_URI=mongodb://mongodb:27017/mediafusion
-      - REDIS_URL=redis://redis:6379
-      - IS_SCRAP_FROM_TORRENTIO=true
-      - IS_SCRAP_FROM_MEDIAFUSION=true
-      - IS_SCRAP_FROM_ZILEAN=true
-      - IS_SCRAP_FROM_PROWLARR=true
-      - IS_SCRAP_FROM_JACKETT=true
-      - IS_SCRAP_FROM_YTS=false
-      - PROWLARR_API_KEY=${PROWLARR_API_KEY:-}
-      - PROWLARR_URL=http://prowlarr:9696
-      - PROWLARR_IMMEDIATE_MAX_PROCESS=30
-      - PROWLARR_IMMEDIATE_MAX_PROCESS_TIME=30
-      - PROWLARR_SEARCH_INTERVAL_HOUR=24
-      - PROWLARR_LIVE_TITLE_SEARCH=true
-      - JACKETT_URL=http://jackett:9117
-      - JACKETT_API_KEY=${JACKETT_API_KEY:-}
-      - JACKETT_IMMEDIATE_MAX_PROCESS=30
-      - JACKETT_IMMEDIATE_MAX_PROCESS_TIME=30
-      - JACKETT_SEARCH_INTERVAL_HOUR=24
-      - JACKETT_LIVE_TITLE_SEARCH=true
-      - ENABLE_RATE_LIMIT=false
-      - TORRENTIO_URL=https://torrentio.strem.fun
-      - MEDIAFUSION_URL=https://mediafusion.elfhosted.com
-      - ZILEAN_URL=http://zilean:8181
-      - STORE_STREMTHRU_MAGNET_CACHE=false
-      - REQUESTS_PROXY_URL=http://warp:1080
-      - FLARESOLVERR_URL=http://flaresolverr:8191
-      - TMDB_API_KEY=${TMDB_API_KEY} # https://www.themoviedb.org/settings/api
-      - SECRET_KEY=${MEDIAFUSION_SECRET_KEY}  # openssl rand -hex 32
-      - API_PASSWORD=${MEDIAFUSION_API_PASSWORD} # random password for API
-#     - LOGGING_LEVEL="DEBUG"
+    env_file:
+      - ./data/mediafusion/.env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 1m
@@ -265,46 +233,14 @@ services:
     image: mhdzumair/mediafusion:latest
     container_name: dramatiq-worker
     command: ["pipenv", "run", "dramatiq", "api.task", "-p", "1", "-t", "4"]
-    environment:
-      - HOST_URL=https://${MEDIAFUSION_HOSTNAME?}
-      - POSTER_HOST_URL=https://${MEDIAFUSION_HOSTNAME?}
-      - MONGO_URI=mongodb://mongodb:27017/mediafusion
-      - REDIS_URL=redis://redis:6379
-      - IS_SCRAP_FROM_TORRENTIO=true
-      - IS_SCRAP_FROM_MEDIAFUSION=true
-      - IS_SCRAP_FROM_ZILEAN=true
-      - IS_SCRAP_FROM_PROWLARR=true
-      - IS_SCRAP_FROM_JACKETT=true
-      - IS_SCRAP_FROM_YTS=false
-      - PROWLARR_API_KEY=${PROWLARR_API_KEY:-}
-      - PROWLARR_URL=http://prowlarr:9696
-      - PROWLARR_IMMEDIATE_MAX_PROCESS=30
-      - PROWLARR_IMMEDIATE_MAX_PROCESS_TIME=30
-      - PROWLARR_SEARCH_INTERVAL_HOUR=24
-      - PROWLARR_LIVE_TITLE_SEARCH=true
-      - JACKETT_URL=http://jackett:9117
-      - JACKETT_API_KEY=${JACKETT_API_KEY:-}
-      - JACKETT_IMMEDIATE_MAX_PROCESS=30
-      - JACKETT_IMMEDIATE_MAX_PROCESS_TIME=30
-      - JACKETT_SEARCH_INTERVAL_HOUR=24
-      - JACKETT_LIVE_TITLE_SEARCH=true
-      - ENABLE_RATE_LIMIT=false
-      - TORRENTIO_URL=https://torrentio.strem.fun
-      - MEDIAFUSION_URL=https://mediafusion.elfhosted.com
-      - ZILEAN_URL=http://zilean:8181
-      - STORE_STREMTHRU_MAGNET_CACHE=false
-      - REQUESTS_PROXY_URL=http://warp:1080
-      - FLARESOLVERR_URL=http://flaresolverr:8191
-      - TMDB_API_KEY=${TMDB_API_KEY} # https://www.themoviedb.org/settings/api
-      - SECRET_KEY=${MEDIAFUSION_SECRET_KEY?}  # openssl rand -hex 32
-      - API_PASSWORD=${MEDIAFUSION_API_PASSWORD} # random password for API
-#     - LOGGING_LEVEL="DEBUG"
+    restart: unless-stopped
+    env_file:
+      - ./data/mediafusion/.env
     depends_on:
       mongodb:
         condition: service_healthy
       redis:
         condition: service_healthy
-    restart: unless-stopped
 
   browserless:
     image: ghcr.io/browserless/chromium
