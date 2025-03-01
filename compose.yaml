@@ -597,6 +597,9 @@ services:
       retries: 5
   # garnet:
   #   image: 'ghcr.io/microsoft/garnet'
+  #   commands:
+  #     - --lua
+  #     - --lua-transaction-mode
   #   ulimits:
   #     memlock: -1
   #   container_name: garnet
