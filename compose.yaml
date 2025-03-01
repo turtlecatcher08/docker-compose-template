@@ -506,7 +506,7 @@ services:
   #   volumes:
   #     - ./data/byparr/screenshots:/app/screenshots 
   #   healthcheck:
-  #     test: wget -qO- http://localhost:8191/health
+  #     test: curl -f http://localhost:8191/health
   #     interval: 5m
   #     timeout: 10s
   #     retries: 3
