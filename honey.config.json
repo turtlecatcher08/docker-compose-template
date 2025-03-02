@@ -53,7 +53,7 @@
 			"name": "AIOStremio",
 			"desc": "All-in-one streaming service.",
 			"href": "https://aiostremio.yourdomain.com",
-			"icon": "img/custom/aiostremio.png"
+			"icon": ""
 		},
 		{
 			"name": "Comet",
