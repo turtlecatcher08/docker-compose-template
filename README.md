@@ -1,6 +1,7 @@
 # stremio-addons-compose-template
 A template compose.yaml to self host various Stremio addons and utilities
 
+You can use the Always Free resources of Oracle to set this up. Here is a [set up guide](https://guides.viren070.me/oracle) I made for that. 
 
 ## Short Guide 
 
