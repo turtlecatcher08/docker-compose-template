@@ -8,14 +8,11 @@ You can use the Always Free resources of Oracle to set this up. Here is a [set u
 On your server/VPS: 
 
 1. Install docker per https://get.docker.com
-2. Forward port 443
+2. Forward port 443 and 80. 
 3. Point the necessary domain(s) to the public IP of your server/VPS with your DNS.
 4. Run the following commands on your VPS:
    ```
-   curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/.env -o .env
-   curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/compose.yaml -o compose.yaml
-   mkdir -p ./data/mediafusion
-   curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/.env.mediafusion -o ./data/mediafusion/.env
+   curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/install.sh | bash
    ```
 5. Open the .env file using:
    ```
