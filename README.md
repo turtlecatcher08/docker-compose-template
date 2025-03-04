@@ -21,9 +21,11 @@ If you know what you're doing, then this is the general guide:
 4. Fill in all the values, making sure to read all the comments.
 5. Run this command:
    ```
-   docker compose --profile all up -d
+   docker compose up -d
    ```
    - You can check the compose.yaml or the full guide above to see what profiles are available.
+   - Ensure you defined the `COMPOSE_PROFILES` environment variable in the .env file, otherwise only the default services will be started.
+      - You can also use the --profile flag e.g. docker compose --profile stremio --profile seanime up -d
    - Ensure port 443 and port 80 is open
    - Ensure you have DNS records that handle each hostname you are making use of which will point the hostname to the public IP of your server
    - Ensure you follow the instructions in the .env for any additional instructions that need to be carried out for some services (e.g. adding the prowlarr/jackett api keys or editing Seanime's config.toml)
