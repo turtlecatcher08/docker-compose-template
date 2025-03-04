@@ -817,7 +817,7 @@ services:
       - "traefik.http.routers.aiostremio.entrypoints=websecure"
       - "traefik.http.routers.aiostremio.tls.certresolver=myresolver"
       - "flame.type=app"
-      - "flame.name=AIOStreams"
+      - "flame.name=AIOStremio"
       - "flame.url=https://${AIOSTREMIO_HOSTNAME}"
     profiles:
       - stremio
