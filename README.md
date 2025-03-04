@@ -3,31 +3,28 @@ A template compose.yaml to self host various Stremio addons and utilities
 
 You can use the Always Free resources of Oracle to set this up. Here is a [set up guide](https://guides.viren070.me/oracle) I made for that. 
 
-## Short Guide 
+A full start-to-finish guide, which assumes you start from scratch, can be found on my site [here](https://guides.viren070.me/selfhosting).
 
-On your server/VPS: 
+It will go through setting up an Oracle VPS for free, installing Docker, and then a guide on using this compose.yaml. 
 
-1. Install docker per https://get.docker.com
-2. Forward port 443 and 80. 
-3. Point the necessary domain(s) to the public IP of your server/VPS with your DNS.
-4. Run the following commands on your VPS:
+If you know what you're doing, then this is the general guide:
+
+1. Ensure docker is installed per https://get.docker.com
+2. Download and run the installation script
    ```
    curl https://raw.githubusercontent.com/Viren070/stremio-addons-docker-compose-template/refs/heads/main/install.sh | bash
    ```
-5. Open the .env file using:
+3. Open the .env file using:
    ```
    nano .env
    ```
-6. Fill in all the values, making sure to read all the comments.
-7. Run this command:
+4. Fill in all the values, making sure to read all the comments.
+5. Run this command:
    ```
-   docker compose --profile stremio up -d
+   docker compose --profile all up -d
    ```
-8. Go to the prowlarr and jackett dashboards and configure them. Ensure you add authentication as they will be public.
-9. Now, fill in the values for `JACKETT_API_KEY`, `PROWLARR_API_KEY`, and `COMET_INDEXERS` by getting the values from the respective dashboards
-10. If using Seanime, change the `host` under `[server]` in the ./seanime-config/config.toml file from `127.0.0.1` to `0.0.0.0`
-11. Restart for the updated configuration:
-    ```
-    docker compose down seanime
-    docker compose --profile seanime up -d 
-    ```
+   - You can check the compose.yaml or the full guide above to see what profiles are available.
+   - Ensure port 443 and port 80 is open
+   - Ensure you have DNS records that handle each hostname you are making use of which will point the hostname to the public IP of your server
+   - Ensure you follow the instructions in the .env for any additional instructions that need to be carried out for some services (e.g. adding the prowlarr/jackett api keys or editing Seanime's config.toml)
+  
