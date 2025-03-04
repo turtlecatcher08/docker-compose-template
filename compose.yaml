@@ -1136,7 +1136,7 @@ services:
       - all
   
   zipline:
-    image: ghcr.io/diced/zipline:latest
+    image: ghcr.io/diced/zipline:v4
     container_name: zipline
     restart: unless-stopped
     expose:
