@@ -1179,6 +1179,27 @@ services:
     profiles:
       - zipline
       - all
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      DOMAIN: "https://${VAULTWARDEN_HOSTNAME?}"
+    volumes:
+      - ./data/vaultwarden:/data/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`${VAULTWARDEN_HOSTNAME?}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=myresolver"
+      - "flame.type=app"
+      - "flame.name=Vaultwarden"
+      - "flame.url=https://${VAULTWARDEN_HOSTNAME?}"
+    profiles:
+      - vaultwarden
+      - all
   # ================================================================================================== 
   #   DEBRID MEDIA SERVER
   # ==================================================================================================
