@@ -1179,6 +1179,37 @@ services:
     profiles:
       - zipline
       - all
+
+  # https://setupmc.com/java-server/
+  # Use the above link to generate the service configuration for your Minecraft server.
+  minecraft:
+    image: itzg/minecraft-server:latest
+    tty: true
+    stdin_open: true
+    container_name: minecraft
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: ${MINECRAFT_SERVER_TYPE:-PAPER}
+      MEMORY: ${MINECRAFT_SERVER_MEMORY:-8G}
+      MOTD: ${MINECRAFT_SERVER_MOTD:-"A Minecraft Server"}
+      OVERRIDE_ICON: ${MINECRAFT_SERVER_OVERRIDE_ICON:-}
+      ICON: ${MINECRAFT_SERVER_ICON:-}
+      USE_AIKAR_FLAGS: "TRUE"
+      TZ: ${TZ:-UTC}
+      DIFFICULTY: "2"
+      VIEW_DISTANCE: ${MINECRAFT_SERVER_VIEW_DISTANCE:-10}
+      OPS: |-
+        ${MINECRAFT_SERVER_OP:-}
+      ENABLE_WHITE_LIST: ${MINECRAFT_SERVER_ENABLE_WHITE_LIST:-false}
+      WHITELIST: ${MINECRAFT_SERVER_WHITELIST:-}
+    volumes:
+      - "./data/minecraft:/data"
+    profiles:
+      - minecraft
+      - all
+
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: vaultwarden
