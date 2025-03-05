@@ -95,7 +95,7 @@ services:
       DASHDOT_SHOW_HOST: ${DASHDOT_SHOW_HOST:-true}
       DASHDOT_CUSTOM_HOST: ${DASHDOT_CUSTOM_HOST:-}
       DASHDOT_ACCEPT_OOKLA_EULA: true
-      DASHDOT_NETWORK_SPEED_AS_BYTES: true
+      DASHDOT_NETWORK_SPEED_AS_BYTES: false
     volumes:
       - /:/mnt/host:ro
     labels:
