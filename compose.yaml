@@ -1,26 +1,23 @@
 # This is a sample docker-compose file for setting up a server with several addons and services you can use with Stremio.
-# 
-# The following addons are included in this compose project:
-# - AIOStreams: https://github.com/Viren070/AIOStreams
-# - TMDB Addon: https://github.com/mrcanelas/tmdb-addon
-# - EasyNews+: https://github.com/sleeyax/stremio-easynews-addon
-# - Comet: https://github.com/g0ldyy/comet
-# - MediaFusion: https://github.com/mhdzumair/mediafusion
-# - StremThru: https://github.com/MunifTanjim/stremthru
-# - Jackettio: https://github.com/arvida42/jackettio
-# - Stremio-Jackett: https://github.com/aymene69/stremio-jackett
-# 
-# As well as the following services which the addons are already configured to work with:
-# - MediaFlow Proxy: https://github.com/mhdzumair/mediaflow-proxy - To proxy your streams
-# - Zilean: https://github.com/ipromknight/zilean - DMM scraper
-# - Prowlarr: https://github.com/prowlarr/prowlarr - https://github.com/hotio/prowlarr - Indexer manager used by Comet, MediaFusion. (Need to add indexers manually)
-# - Jackett: https://github.com/Jackett/Jackett - https://github.com/linuxserver/docker-jackett  - Indexer manager used by MediaFusion, Jackettio, Stremio-Jackett (Need to add indexers manually)
-# - FlareSolverr: https://github.com/flaresolverr/flaresolverr - Proxy for solving Cloudflare challenges
-# - Warp for SOCKS5 proxy to bypass VPS blocks 
-# - Watchtower for auto-updating services
 #
-# Finally, Traefik is used as a reverse proxy to route traffic to the services and addons.
+# This template includes the following default services:
+# - Traefik: Reverse proxy for routing traffic to the services
+# - Flame/Honey: Start page for your server
+# - Dash: Dashboard for monitoring server resources
+# - Uptime Kuma: Status page for monitoring uptime
+# - Watchtower: Auto-updating services
+# - Dozzle: Web UI for viewing logs
 #
+# It has additional optional profiles for:
+# - stremio: includes stremio addons and utilities
+# - debrid_media_server: includes services for building a debrid media server
+# - minecraft: includes services for running a Minecraft server with PaperMC
+# - vaultwarden: a bitwarden compatible server written in Rust
+# - zipline: a file upload server/url shortener/ShareX server. 
+# - searxng: a self hosted search engine
+# - plausible: self hosted, privacy friendly analytics
+# - all: includes all profiles
+
 # This file is only a template and it requires the .env file to be set up with the necessary environment variables. 
 #
 # Tips:
