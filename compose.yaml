@@ -328,8 +328,9 @@ services:
       - SCRAPE_ZILEAN=True
       - ZILEAN_URL=http://zilean:8181 # or https://zilean.elfhosted.com if not hosting zilean locally
       - ZILEAN_TAKE_FIRST=500
-      - SCRAPE_TORRENTIO=False
-      - SCRAPE_MEDIAFUSION=False
+      - SCRAPE_TORRENTIO=True
+      - SCRAPE_MEDIAFUSION=True
+      - SCRAPE_COMET=True
       - MEDIAFUSION_URL=http://mediafusion:8000 # or https://mediafusion.elfhosted.com if not hosting mediafusion locally
       - STREMTHRU_URL=http://stremthru:8080 # or https://stremthru.13377001.xyz if not hosting stremthru locally
       - DOWNLOAD_TORRENT_FILES=False
