@@ -451,7 +451,7 @@ services:
       - all
 
   stremthru:
-    image: muniftanjim/stremthru:latest-heavy
+    image: muniftanjim/stremthru:latest
     container_name: stremthru
     restart: unless-stopped
     expose:
