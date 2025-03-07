@@ -1265,6 +1265,22 @@ services:
   #     - debrid_media_server
   #     - all
 
+  # repair:
+  #   image: ghcr.io/westsurname/scripts/scripts:latest
+  #   container_name: repair
+  #   command: python repair.py --no-confirm
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./data/blackhole/.env
+  #   volumes: 
+  #     - ${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}:${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}:${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${SONARR_ROOT_FOLDER}:${SONARR_ROOT_FOLDER}
+  #     - ${RADARR_ROOT_FOLDER}:${RADARR_ROOT_FOLDER}
+  #   profiles:
+  #     - debrid_media_server
+  #     - all
+
   # blackhole4k:
   #   image: ghcr.io/westsurname/scripts/blackhole:latest
   #   container_name: blackhole4k
@@ -1294,7 +1310,23 @@ services:
   #   profiles:
   #     - debrid_media_server
   #     - all
-
+    
+  # repair4k:
+  #   image: ghcr.io/westsurname/scripts/scripts:latest
+  #   container_name: repair4k
+  #   command: python repair.py --no-confirm
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./data/blackhole/.env
+  #   volumes: 
+  #     - ${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}:${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}:${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${SONARR_ROOT_FOLDER_4K}:${SONARR_ROOT_FOLDER_4K}
+  #     - ${RADARR_ROOT_FOLDER_4K}:${RADARR_ROOT_FOLDER_4K}
+  #   profiles:
+  #     - debrid_media_server
+  #     - all
+    
   # blackholeanime:
   #   image: ghcr.io/westsurname/scripts/blackhole:latest
   #   container_name: blackholeanime
@@ -1321,6 +1353,22 @@ services:
   #       condition: service_healthy
   #     radarranime:
   #       condition: service_healthy
+  #   profiles:
+  #     - debrid_media_server
+  #     - all
+    
+  # repairanime:
+  #   image: ghcr.io/westsurname/scripts/scripts:latest
+  #   container_name: repairanime
+  #   command: python repair.py --no-confirm
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./data/blackhole/.env
+  #   volumes: 
+  #     - ${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}:${REALDEBRID_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}:${TORBOX_MOUNT_TORRENTS_PATH:-/dev/null}
+  #     - ${SONARR_ROOT_FOLDER_ANIME}:${SONARR_ROOT_FOLDER_ANIME}
+  #     - ${RADARR_ROOT_FOLDER_ANIME}:${RADARR_ROOT_FOLDER_ANIME}
   #   profiles:
   #     - debrid_media_server
   #     - all
@@ -1600,6 +1648,58 @@ services:
   #   profiles:
   #     - debrid_media_server
   #     - all
+  #
+  # jellyfin:
+  #   image: lscr.io/linuxserver/jellyfin:latest
+  #   restart: unless-stopped
+  #   container_name: jellyfin
+  #   expose:
+  #     - 8096
+  #   environment:
+  #     - TZ=${TZ:-UTC}
+  #   volumes:
+  #     - ./data/jellyfin:/config
+  #     - /mnt:/mnt
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_HOSTNAME}`)"
+  #     - "traefik.http.routers.jellyfin.tls=true"
+  #     - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+  #     - "traefik.http.routers.jellyfin.tls.certresolver=myresolver"
+  #     - "flame.type=app"
+  #     - "flame.name=Jellyfin"
+  #     - "flame.url=https://${JELLYFIN_HOSTNAME}"
+  #   depends_on:
+  #     - rclone
+  #   profiles:
+  #     - debrid_media_server
+  #     - all
+
+  # jellyseer:
+  #   image: fallenbagel/jellyseerr:latest
+  #   container_name: jellyseer
+  #   restart: unless-stopped
+  #   expose:
+  #     - 5055
+  #   environment:
+  #     - TZ=${TZ:-UTC}
+  #     - LOG_LEVEL=debug
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.jellyseer.rule=Host(`${JELLYSEER_HOSTNAME}`)"
+  #     - "traefik.http.routers.jellyseer.entrypoints=websecure"
+  #     - "traefik.http.routers.jellyseer.tls.certresolver=myresolver"
+  #     - "flame.type=app"
+  #     - "flame.name=Jellyseer"
+  #     - "flame.url=https://${JELLYSEER_HOSTNAME}"
+  #   volumes:
+  #     - ./data/jellyseer:/app/config
+  #   depends_on:
+  #     - rclone
+  #   profiles:
+  #     - debrid_media_server
+  #     - all
+  #
   # zurg: 
   #   image: ghcr.io/debridmediamanager/zurg-testing:v0.9.3-final
   #   container_name: zurg
