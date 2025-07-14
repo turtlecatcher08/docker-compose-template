@@ -1,1 +1,4 @@
 ..*
+data/authelia/cache/dump.rdb
+data/authelia
+data/traefik/acme.json

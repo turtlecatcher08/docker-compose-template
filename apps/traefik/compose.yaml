@@ -4,7 +4,8 @@ services:
     container_name: traefik
     restart: unless-stopped
     environment:
-      - TZ=${TZ:-UTC}
+      - TZ=Australia/Melbourne
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_API_TOKEN?}
     ports:
       - 443:443
       - 80:80
@@ -30,16 +31,17 @@ services:
 
       - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
       - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
-      - "--entryPoints.web.forwardedHeaders.trustedIPs=${TRUSTED_IPS}"
-      - "--entryPoints.web.proxyProtocol.trustedIPs=${TRUSTED_IPS}"
+      - "--entryPoints.web.forwardedHeaders.trustedIPs=${TRUSTED_IPS?}"
+      - "--entryPoints.web.proxyProtocol.trustedIPs=${TRUSTED_IPS?}"
 
 
       - "--entryPoints.websecure.forwardedHeaders.insecure=false"
       - "--entryPoints.websecure.proxyProtocol.insecure=false"
-      - "--entryPoints.websecure.forwardedHeaders.trustedIPs=${TRUSTED_IPS}"
-      - "--entryPoints.websecure.proxyProtocol.trustedIPs=${TRUSTED_IPS}"
+      - "--entryPoints.websecure.forwardedHeaders.trustedIPs=${TRUSTED_IPS?}"
+      - "--entryPoints.websecure.proxyProtocol.trustedIPs=${TRUSTED_IPS?}"
 
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL?}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/config/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.caserver=${LE_CA_SERVER?}"

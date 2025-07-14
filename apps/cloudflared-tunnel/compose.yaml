@@ -1,0 +1,15 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    # The 'tunnel run' command uses the token from the environment to connect to the correct tunnel.
+    command: tunnel run
+    env_file:
+      - .env
+    networks:
+      - web-services
+
+networks:
+  web-services:
+    external: true
